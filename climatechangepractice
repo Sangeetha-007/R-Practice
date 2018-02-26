@@ -1,0 +1,27 @@
+# A tibble: 6 x 1
+                                                                  `Actuaries Climate IndexTM Values`
+                                                                                               <chr>
+1                                                                                Spring 2017 Release
+2                                                                                              43117
+3                                                                                               <NA>
+4           This Excel® workbook contains the standardized anomalies for the ACI and its components.
+5 These values are the basis for the graphs and maps shown on the Actuaries Climate IndexTM website.
+6                         In fact, each line of data is a file that is used for the maps and graphs.
+> actuaries <- read_excel("Actuaries-Climate-Index-Values-Through-May-2017_Spring-2017_English.xlsx", sheet = 1)
+> head(actuaries)
+# A tibble: 6 x 1
+                                                                  `Actuaries Climate IndexTM Values`
+                                                                                               <chr>
+1                                                                                Spring 2017 Release
+2                                                                                              43117
+3                                                                                               <NA>
+4           This Excel® workbook contains the standardized anomalies for the ACI and its components.
+5 These values are the basis for the graphs and maps shown on the Actuaries Climate IndexTM website.
+6                         In fact, each line of data is a file that is used for the maps and graphs.
+> dim(actuaries)
+[1] 10  1
+> actuaries <- read_excel("Actuaries-Climate-Index-Values-Through-May-2017_Spring-2017_English.xlsx", sheet = 2)
+> dim(actuaries)
+[1]  40 678
+> head(actuaries)
+# A tibble: 6 x 678
