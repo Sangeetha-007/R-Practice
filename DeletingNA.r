@@ -4,6 +4,9 @@ library(ggplot2)
 library(plotly)
 library(lubridate)
 library(dplyr)
+library(grid)
+library(gridExtra)
+
 setwd("/Users/Sangeetha/Downloads/")
 
 
@@ -46,6 +49,49 @@ for(i in 1:length(years)){
 field_names <- field_names[1:(length(field_names)-7)]
 
 colnames(actuaries) <- field_names
+
+
+all_regions <- melt(actuaries, id=c("Sea_Level_Monthly"))
+names(all_regions) <- c("region", "month_date", "sea_level")
+all_regions$month_date <- as.Date(all_regions$month_date)
+
+all_regions <- all_regions %>% arrange(region, month_date)
+
+all_regions_plot <- ggplot( data = all_regions, aes(x=month_date, y=sea_level ) ) 
+all_regions_plot <- all_regions_plot + geom_line() + facet_grid(.~region )
+
+plot(all_regions_plot)
+#*********************************************************************************
+all_regions <- all_regions %>% filter( (region != "No data for CAR region") & (region != "No data for MID region")  )
+
+#plot in grid of 4 * 7
+
+list_plots <- list()
+list_index <- 1
+
+tmp_index = 1 
+region_title = ""
+
+for(i in seq(678, nrow(all_regions), 677)){
+  
+  region_title <- all_regions[(tmp_index+1), "region"] %>% unlist() 
+  region_title <- gsub("ACI_sealevel_", "", region_title)
+  region_title <- gsub("(_.*)?(.csv)?", "", region_title)
+  
+  tmp_plot <- ggplot( data = all_regions[tmp_index:i, ], aes(x=month_date, y=sea_level ) ) + geom_line() + labs(title = region_title) 
+  
+  list_plots[[list_index]] <- tmp_plot
+  
+  tmp_index <- i
+  
+  list_index <- list_index + 1
+  
+}
+
+marrangeGrob(list_plots, ncol = 7, nrow = 4)
+
+#**************************************************************************
+
 
 
 actuaries_part1 <- actuaries[4,]
@@ -102,9 +148,11 @@ actuaries_part1$section <- paste("Section", actuaries_part1$section)
 plot_data <- actuaries_part1[, c("sea_level", "section", "month_date")]
 
 
-sectioned_plot <- ggplot( data = plot_data, aes(x=sea_level, y=month_date) ) + geom_line() + facet_grid(.~section )
+sectioned_plot <- ggplot( data = plot_data, aes(x=month_date, y=sea_level ) ) + geom_line() + facet_grid(.~section )
 
 print(sectioned_plot)
 
+
+plot(sectioned_plot)
 
 
