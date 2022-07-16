@@ -30,4 +30,6 @@ my_list <- list(rank=1:5, names = c("Sangeetha", "Sasikumar"))
 print(my_list[5])
 #Create a data frame with four columns – one each character, factor (with three levels), numeric, and date.
 #Your data frame should have at least 10 observations (rows).
+df <- data.frame(first_column, second_column, third_column, fourth_column)
+
 
