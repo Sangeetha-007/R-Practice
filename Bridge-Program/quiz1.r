@@ -24,3 +24,10 @@ print(new) '''
 numVec <- c(1:8,7:14,7:10)
 numVec <- 3 * numVec ^ 2 - 4 * numVec + 1
 numVec
+
+#Create a named list. That is, create a list with several elements that are each able to be referenced by name.
+my_list <- list(rank=1:5, names = c("Sangeetha", "Sasikumar"))
+print(my_list[5])
+#Create a data frame with four columns – one each character, factor (with three levels), numeric, and date.
+#Your data frame should have at least 10 observations (rows).
+
