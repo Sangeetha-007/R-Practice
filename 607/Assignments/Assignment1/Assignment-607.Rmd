@@ -1,0 +1,72 @@
+---
+title: "Assignment1 - 607"
+author: Sangeetha Sasikumar
+Date: September 3, 2022
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(ggplot2)
+```
+Introduction:
+The article I chose to do my analysis on wasn't an actual pure "news article". "Club Soccer Predictions": https://projects.fivethirtyeight.com/soccer-predictions/ was more of a listing of predictions and current rankings. 
+I chose this dataset because the World Cup is around the corner and I am a huge fan of soccer. 
+
+```{r}
+soccer_data<-read.csv('https://raw.githubusercontent.com/Sangeetha-007/R-Practice/master/607/Assignments/Assignment1/spi_global_rankings_intl.csv')
+head(soccer_data)
+```
+
+Summary of the International Soccer Power Index data
+```{r, echo=FALSE}
+summary(soccer_data)
+
+```
+
+Created a subset with the 10 team international teams
+```{r}
+soccer_subset<-head(soccer_data, 10)
+soccer_subset
+```
+
+Renamed the columns of the subset
+```{r}
+colnames(soccer_subset) <- c("Ranking", "Country", "Association", "Offense", "Defense", "Soccer Power Index")
+head(soccer_subset)
+
+```
+Looked at the summary of the new subset
+```{r}
+summary(soccer_subset)
+```
+
+Created a new csv of the subset so it can be uploaded to github
+```{r}
+write.csv(soccer_subset, file="SoccerSubset.csv", row.names=FALSE)
+getwd()
+
+```
+Bar graph on Defense per Country
+```{r}
+ggplot(soccer_subset, aes(x=Country, y=Defense)) + geom_bar(stat="identity") + 
+  labs(x="Country", y="Defense") +ggtitle("International Soccer Team Defense Values")
+
+```
+
+Bar graph on Offense per Country
+```{r}
+ggplot(soccer_subset, aes(x=Country, y=Offense)) + geom_bar(stat="identity") + 
+  labs(x="Country", y="Offense") +ggtitle("International Soccer Team Offense Values")
+```
+
+
+The country with the highest defense is Belgium, while the country with the highest offense is Germany. This is interesting to me
+because I didn't think Belgium is a strong soccer team at all. I would have assumed Argentina or Brazil would have higher values. 
+
+Conclusion/Findings and Recommendations:
+
+From my analysis, it was interesting to see how highest defense is Belgium and highest offense is Germany. I can't make further
+analysis based on the data presented in the zip file to take this analysis further, but if I find supporting data elsewhere, it may
+be beneficial. Data based on the number of fans or population for each national team would be helpful and I can probably check if there
+is a correlation to the offenses and defenses.
