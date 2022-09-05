@@ -1,1 +1,113 @@
+---
+title: "Lab 1: Intro to R"
+author: "Sangeetha Sasikumar"
+date: "`r Sys.Date()`"
+output: openintro::lab_report
+---
+
+```{r load-packages, message=FALSE}
+library(tidyverse)
+library(openintro)
+library(dplyr)
+
+data('arbuthnot', package='openintro')
+arbuthnot$boys #will only show the number of boys baptized each year
+#dollar sign basically says “go to the data frame that comes before me, and find the variable that comes after me”.
+```
+
+### Exercise 1: What command would you use to extract just the counts of girls baptized?
+
+```{r view-girls-counts}
+arbuthnot$girls
+```
+
+
+### Exercise 2: Is there an apparent trend in the number of girls baptized over the years? How would you describe it? (To ensure that your lab report is comprehensive, be sure to include the code needed to make the plot as well as your written interpretation.)
+
+
+```{r trend-girls}
+# Insert code for Exercise 2 here
+ggplot(data = arbuthnot, aes(x = year, y = girls)) + 
+  geom_line()
+```
+The overall trend from the late 1620s has been upward in the amount of girls baptized. There are many drops (especially around 1703-1704), however, if we look at the big picture, it has only been increasing. 
+
+
+### Exercise 3: Now, generate a plot of the proportion of boys born over time. What do you see?
+
+
+```{r plot-prop-boys-arbuthnot}
+# Insert code for Exercise 3 here
+arbuthnot <- arbuthnot %>%
+  mutate(total = boys + girls)
+ggplot(data = arbuthnot, aes(x = year, y = boys/total)) + geom_line()
+
+
+#ggplot(data = arbuthnot, aes(x = year, y = boys)) + geom_line() 
+#in case a proportion to total is not needed, then the code should be the above
+
+
+```
+
+
+### Exercise 4:What years are included in this data set? What are the dimensions of the data frame? What are the variable (column) names?
+
+
+```{r dim-present}
+# Insert code for Exercise 4 here
+data('present', package='openintro')
+range(present$year)
+#The years used in this dataset is from 1940 to 2002.
+dim(present)
+#There are 63 rows and 3 columns in the arbuthnot dataset. 
+colnames(present)
+#The column names are "year", "boys", and "girls". 
+
+```
+
+
+### Exercise 5: How do these counts compare to Arbuthnot’s? Are they of a similar magnitude?
+
+
+```{r count-compare}
+# Insert code for Exercise 5 here
+range(arbuthnot$year)
+#The range is from 1629 to 1710; a total of 81 years compared to the
+#data in the present which looked at only 62 years.  '''
+dim(arbuthnot)
+#There is a total of 82 rows and 4 columns in the arbuthnot dataset,compared to 63 rows and 3 columns in the present dataset.  
+colnames(arbuthnot)
+#The column names are the same except the arbuthnot has a total column too. 
+
+```
+
+
+### Exercise 6
+
+Insert any text here.
+
+```{r plot-prop-boys-present}
+# Insert code for Exercise 6 here
+present <- present %>%
+  mutate(total = boys + girls)
+ggplot(data = present, aes(x = year, y = boys/total)) + geom_line()
+
+```
+
+
+### Exercise 7: In what year did we see the most total number of births in the U.S.? Hint: First calculate the totals and save it as a new variable. Then, sort your dataset in descending order based on the total column. You can do this interactively in the data viewer by clicking on the arrows next to the variable names. To include the sorted result in your report you will need to use two new functions: arrange (for sorting). We can arrange the data in a descending order with another function: desc (for descending order).
+
+
+```{r find-max-total}
+# Insert code for Exercise 7 here
+present <- present %>%
+        mutate(total = boys + girls)
+present <- present %>%
+        arrange(desc(total))
+head(present)
+#1961 had the most total number of births.
+```
+
+Further Questions: Arbuthnot's data showed boys and girls who are baptized from 1629 to 1710, but it would be interesting to see
+what the data is for unbaptized children.
 
