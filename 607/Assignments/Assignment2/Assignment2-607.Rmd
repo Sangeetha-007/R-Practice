@@ -4,6 +4,7 @@ author: "Sangeetha Sasikumar"
 date: "9/11/2022"
 output: html_document
 ---
+#The form I used to collect data: https://docs.google.com/forms/d/1tdUoAuHFfhJkyO06Tyvy0e5Z-vLfyBQRMuGs8CHYsrY/edit
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
@@ -15,14 +16,14 @@ conn <- dbConnect(MySQL(), user='root', password='********', dbname='mydb', host
 dbListTables(conn)
 ```
 
-Testing the connections:
+#Testing the connections:
 ```{r}
 dbListTables(conn)
 dbListFields(conn, 'movie_rating')
 ```
 
 
-Creating the dataframe:
+#Creating the dataframe:
 ```{r, echo=FALSE}
 #rs = dbSendQuery(mydb, "select * from movie_rating;")
 
@@ -30,12 +31,12 @@ df = dbGetQuery(conn, "SELECT * from movie_rating;")
 
 print(df)
 ```
-Summary of the dataframe:
+#Summary of the dataframe:
 ```{r}
 summary(df)
 
 ```
-Trying to make a graph:
+#Trying to make a graph:
 ```{r}
 ggplot(df, aes(x=gender, y=spiderman)) + geom_bar(stat="identity") + 
   labs(x="gender", y="spiderman") +ggtitle("Ratings of Spiderman based on Gender")
