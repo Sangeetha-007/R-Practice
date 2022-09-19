@@ -1,0 +1,75 @@
+---
+title: "Assignment3-607"
+author: "Sangeetha Sasikumar"
+date: "9/16/2022"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
+library(dplyr)
+```
+
+
+1. Using the 173 majors listed in fivethirtyeight.com’s College Majors dataset [https://fivethirtyeight.com/features/the-economic-guide-to-picking-a-college-major/], provide code that identifies the majors that contain either "DATA" or "STATISTICS"
+```{r }
+majors<-read.csv(paste0("https://raw.githubusercontent.com/fivethirtyeight/data/master/college-majors/majors-list.csv"))
+head(majors)
+
+```
+
+```{r}
+#str(majors)
+pattern<-'DATA|STATISTICS'
+grep(pattern, majors$Major, value=TRUE,ignore.case = TRUE)
+#case is ignored because we cant always know if the data is lower case or upper case
+
+```
+
+2. Write code that transforms the data below:
+[1] "bell pepper"  "bilberry"     "blackberry"   "blood orange"
+[5] "blueberry"    "cantaloupe"   "chili pepper" "cloudberry"  
+[9] "elderberry"   "lime"         "lychee"       "mulberry"    
+[13] "olive"        "salal berry"
+Into a format like this:
+c("bell pepper", "bilberry", "blackberry", "blood orange", "blueberry", "cantaloupe", "chili pepper", "cloudberry", "elderberry", "lime", "lychee", "mulberry", "olive", "salal berry")
+
+```{r}
+fruitsAndVeggies <- ' "bell pepper" "bilberry"  "blackberry" "blood orange" "blueberry"    "cantaloupe"   "chili pepper" "cloudberry" "elderberry"  "lime" "lychee"  "mulberry"  "olive"  "salal berry"'
+fruitsAndVeggies
+
+#new_df<-str_extract_all(fruitsAndVeggies, "\\b[a-z]+\\b")
+#new_df
+#str_c works, you need to imagine that you are building up a matrix of strings. Each input argument forms a column, and is expanded to the length of the longest argument, using the usual recyling rules.
+
+#new_df[0:1]
+
+extracted <- str_extract_all(fruitsAndVeggies, "\\w[a-z]+\\s?[a-z]+\\w")
+print(unlist(extracted))   
+class(unlist(extracted))
+```
+
+3. Describe, in words, what these expressions will match: \n \n
+  * (.)\1\1   : Any character 3 times in a row.
+  * "(.)(.)\\2\\1"   : 2 characters that repeat immediately in the reverse order.
+  * (..)\1   : 2 characters that repeat immediately in the same order.
+  * "(.).\\1.\\1"   : Single character that repeats 2 more times, with each repetition after another single character. 
+  * "(.)(.)(.).*\\3\\2\\1"   : Any 3 characters that repeat in the reverse order after any number variable characters.
+
+4. Construct regular expressions to match words that:
+* Start and end with the same character.    `^([a-z]).*\1$`
+* Contain a repeated pair of letters (e.g. "church" contains "ch" repeated twice.)    `([a-zA-Z][a-zA-Z]).*\1`
+* Contain one letter repeated in at least three places (e.g. "eleven" contains three "e"s.) - `([a-zA-Z]).*\1.*\1` 
+
+```{r}
+#Testing: (I ran out of time to do this better)
+mylist<-list("anna", "aann", "church", "eleven")
+output_1 <- str_extract_all(mylist, "^([a-z]).*\1$")
+print(output_1)
+output_2<-str_extract_all(mylist, "([a-zA-Z][a-zA-Z]).*\1")
+print(output_2)
+output_3<-str_extract_all(mylist, "([a-zA-Z]).*\1.*\1")
+print(output_3)
+
+```
