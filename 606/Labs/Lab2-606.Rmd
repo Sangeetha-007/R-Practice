@@ -1,0 +1,137 @@
+---
+title: "Lab 2-606"
+author: "Sangeetha Sasikumar"
+date: "9/7/2022"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+```{r}
+library(tidyverse)
+library(openintro)
+library(ggplot2)
+head(nycflights)
+```
+
+
+*Exercise 1: Look carefully at these three histograms. How do they compare? Are features revealed in one that are obscured in another?
+Yes, the way we read the count value is different for each histogram, especially for the less value parts. It would be helpful to make 2 graphs, so the viewer can read the values more clearly. *
+```{r}
+ggplot(data = nycflights, aes(x = dep_delay)) +
+  geom_histogram()
+
+ggplot(data = nycflights, aes(x = dep_delay)) +
+  geom_histogram(binwidth = 15)
+
+ggplot(data = nycflights, aes(x = dep_delay)) +
+  geom_histogram(binwidth = 150)
+```
+
+*Exercise 2: Create a new data frame that includes flights headed to SFO in February, and save this data frame as sfo_feb_flights. How many flights meet these criteria? *
+
+68 flights meet this category.
+```{r}
+sfo_feb_flights <- nycflights %>%
+  filter(dest == "SFO", month == 2)
+sfo_feb_flights
+
+nrow(sfo_feb_flights) 
+```
+
+*Exercise 3: Describe the distribution of the arrival delays of these flights using a histogram and appropriate summary statistics. Hint: The summary statistics you use should depend on the shape of the distribution.*
+```{r}
+ggplot(data = sfo_feb_flights, aes(x = arr_delay)) +
+  geom_histogram(binwidth=10)
+
+print(IQR(sfo_feb_flights$arr_delay))
+
+```
+
+The graph is right skewed, therefore the higher values are present in the right side of the graph. It would be helpful to make 2 graphs to see
+the data more clearly: one for the right side, and the other for the left side which has lower values. The interquartile range (IQR) of an observation variable is the difference of its upper and lower quartiles. This is my first time ever using IQR, and the value I received for it is 23.25.
+
+*Exercise 4: Calculate the median and interquartile range for arr_delays of flights in in the sfo_feb_flights data frame, grouped by carrier. Which carrier has the most variable arrival delays?*
+
+```{r}
+#median(sfo_feb_flights$arr_delay)
+
+sfo_feb_flights %>%
+  group_by(carrier) %>%
+  summarise(median_arrivalDelay = median(arr_delay), iqr_arrivalDelay = IQR(arr_delay), n_flights = n())
+```
+Delta Airlines and United Airlines have the most variable arrival delays. This is because their IQR are both at 22.00. This means that they have the greatest difference in arrival delays for the middle 50% of their data. (Not too sure if this is right!)
+
+*Exercise 5: Suppose you really dislike departure delays and you want to schedule your travel in a month that minimizes your potential departure delay leaving NYC. One option is to choose the month with the lowest mean departure delay. Another option is to choose the month with the lowest median departure delay. What are the pros and cons of these two choices?*
+```{r}
+#2, 100, -10, 50, 3
+#-10, 2,3, 50, 100   median=3, mean=145/5=29
+sfo_feb_flights %>%
+  group_by(month) %>%
+  summarise(lowMeanDelay = mean(dep_delay))%>%
+  arrange(desc(lowMeanDelay))
+
+sfo_feb_flights %>%
+  group_by(month) %>%
+  summarise(lowMedianDelay = median(dep_delay))%>%
+  arrange(desc(lowMedianDelay))
+
+```
+It seems to be that based on the code written that February is the best month and I don't have to choose between the 2 options because February
+is the best outcome for both situations. Personally, if I had to choose I would choose the mean; although outliers will change up my values. 
+
+*Exercise 6: If you were selecting an airport simply based on on time departure percentage, which NYC airport would you choose to fly out of?*
+
+```{r}
+sfo_feb_flights %>%
+  group_by(month) %>%
+  summarise(lowMedianDelay = median(dep_delay))%>%
+  arrange(desc(lowMedianDelay))
+
+nycflights <- nycflights %>%
+  mutate(dep_type = ifelse(dep_delay < 5, "on time", "delayed"))
+
+nycflights %>%
+  group_by(origin) %>%
+  summarise(ot_dep_rate = sum(dep_type == "on time") / n()) %>%
+  arrange(desc(ot_dep_rate))
+
+ggplot(data = nycflights, aes(x = origin, fill = dep_type)) +
+  geom_bar()
+
+```
+I would choose LaGuardia Airport because it has the best time departure percent at 72.8%. 
+
+*Exercise 7: Mutate the data frame so that it includes a new variable that contains the average speed, avg_speed traveled by the plane for each flight (in mph). Hint: Average speed can be calculated as distance divided by number of hours of travel, and note that air_time is given in minutes.*
+
+```{r}
+nycflights <- nycflights %>%
+  mutate(avg_speed = distance/(arr_time/60))
+
+head(nycflights)
+
+```
+
+*Exercise 8: Make a scatterplot of avg_speed vs. distance. Describe the relationship between average speed and distance. Hint: Use geom_point().*
+```{r}
+
+ggplot(data = nycflights, aes(x = distance , y =avg_speed )) + geom_point()
+
+```
+
+As distance increases, average speed increases of the airplane. This makes sense because if we take a shorter flight, it doesn't go as high above the clouds
+compared to a longer flight, therefore allowing it to go faster. 
+
+*Exercise 9: Replicate the following plot. Hint: The data frame plotted only contains flights from American Airlines, Delta Airlines, and United Airlines, and the points are colored by carrier. Once you replicate the plot, determine (roughly) what the cutoff point is for departure delays where you can still expect to get to your destination on time.*
+```{r}
+
+
+nycflightsBycarriers <- nycflights %>%
+  filter(carrier == "AA" | carrier == "DL" | carrier == "UA")
+ggplot(data =nycflightsBycarriers, aes(x = dep_delay, y = arr_delay, color= carrier)) + geom_point()
+
+
+```
