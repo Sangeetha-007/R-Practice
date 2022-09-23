@@ -13,4 +13,15 @@ movie_titles[str_detect(
   pattern = "3D$"
 )]
 
+# Here's an example pattern that will find the movie Saw 4
+str_match(movie_titles, pattern = "Saw 4")
+
+# Match all sequels of the movie "Saw"
+str_match(movie_titles, pattern = "Saw .")
+
+# Match the letter K and three arbitrary characters
+str_match(movie_titles, pattern = "^K...")
+
+# Detect whether the movie titles end with a full stop
+str_detect(movie_titles, pattern = ".$")
 
