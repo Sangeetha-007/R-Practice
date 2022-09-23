@@ -23,5 +23,5 @@ str_match(movie_titles, pattern = "Saw .")
 str_match(movie_titles, pattern = "^K...")
 
 # Detect whether the movie titles end with a full stop
-str_detect(movie_titles, pattern = ".$")
+str_detect(movie_titles, pattern = "\\.$")
 
