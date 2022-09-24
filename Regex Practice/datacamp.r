@@ -51,3 +51,12 @@ str_match(movie_titles, pattern = "\\w+")
 
 # Match everything that comes before "Knight"
 str_match(movie_titles, pattern = ".*\\Knight")  
+
+# Append the three options: Match Nemo, Harmony or Dory
+str_view(lines, pattern = "Finding Nemo|Harmony|Dory")
+
+# Wrap the three options in parentheses and compare the results
+str_view(lines, pattern = "Finding (Nemo|Harmony|Dory)")
+
+# Use the pattern from above that matched the whole movie names
+str_match(lines, pattern = "Finding (Nemo|Harmony|Dory)")
