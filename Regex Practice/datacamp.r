@@ -60,3 +60,12 @@ str_view(lines, pattern = "Finding (Nemo|Harmony|Dory)")
 
 # Use the pattern from above that matched the whole movie names
 str_match(lines, pattern = "Finding (Nemo|Harmony|Dory)")
+
+# Match both Screen and Screens by making the last "s" optional
+str_match(lines, pattern = "Screens?")
+
+# Match a random amount of arbitrary characters, followed by a comma
+str_match(lines, pattern = ".*,")
+
+# Match the same pattern followed by a comma, but the "lazy" way
+str_match(lines, pattern = ".*?,")
