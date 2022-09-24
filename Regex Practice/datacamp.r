@@ -40,3 +40,14 @@ movie_titles[str_detect(movie_titles,
   pattern = "[^\\w\\s]"
 )]
 
+# This lists all movies with two or more digits in a row
+movie_titles[str_detect(
+  movie_titles,
+  pattern = "\\d{2,}"
+)]
+
+# List just the first words of every movie title
+str_match(movie_titles, pattern = "\\w+")
+
+# Match everything that comes before "Knight"
+str_match(movie_titles, pattern = "(.*?)\\Knight")  #this isnt fully correct
