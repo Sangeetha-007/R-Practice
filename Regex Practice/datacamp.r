@@ -50,4 +50,4 @@ movie_titles[str_detect(
 str_match(movie_titles, pattern = "\\w+")
 
 # Match everything that comes before "Knight"
-str_match(movie_titles, pattern = "(.*?)\\Knight")  #this isnt fully correct
+str_match(movie_titles, pattern = ".*\\Knight")  
