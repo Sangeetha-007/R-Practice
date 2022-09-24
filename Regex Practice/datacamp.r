@@ -25,3 +25,18 @@ str_match(movie_titles, pattern = "^K...")
 # Detect whether the movie titles end with a full stop
 str_detect(movie_titles, pattern = "\\.$")
 
+# List all movies that end with a space and a digit
+movie_titles[str_detect(movie_titles,
+  pattern = "\\s\\d$"
+)]
+
+# List all movies that contain "Grey" or "Gray"
+movie_titles[str_detect(movie_titles,
+  pattern = "Gr.y"
+)]
+
+# List all movies with strange characters (no word or space)
+movie_titles[str_detect(movie_titles,
+  pattern = "[^\\w\\s]"
+)]
+
