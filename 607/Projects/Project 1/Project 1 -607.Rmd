@@ -1,0 +1,160 @@
+---
+title: "Project 1- 607"
+author: "Sangeetha Sasikumar"
+date: "9/22/2022"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(stringr)
+library(knitr)
+library(tidyverse)
+library(dplyr)
+library(readr)
+```
+
+
+```{r}
+#Just taking an initial look at the data before anything.
+chess_reader <- readLines('https://raw.githubusercontent.com/Sangeetha-007/R-Practice/master/607/Projects/Project%201/tournamentinfo.txt', skip=1)
+#read text by line 
+
+head(chess_reader)
+class(chess_reader)
+
+```
+
+### Loaded the data in and set the header as true so the first row is not read in. 
+```{r}
+chess_data <- read.delim(file = "https://raw.githubusercontent.com/Sangeetha-007/R-Practice/master/607/Projects/Project%201/tournamentinfo.txt", header = TRUE)
+#If you specify header=FALSE the first line is read in as data.
+class(chess_data)
+head(chess_data)
+
+#getState <- str_extract_all(chess_data, "([A-Z][A-Z])\\s\\|")
+
+```
+### I had to analyze the data from different angles, thus I passed in different values to see what it shows in the dataframe. 
+```{r}
+chess_data[1,0]
+
+```
+```{r}
+chess_data[1,1]
+```
+```{r}
+chess_data[0,1]
+```
+```{r}
+chess_data[2,1]
+
+chess_data[1,2]
+```
+```{r}
+chess_data[1,]
+
+```
+```{r}
+chess_data[2,]
+```
+
+```{r}
+chess_data[3,]
+```
+
+```{r}
+chess_data[4,]
+```
+```{r}
+
+chess_data[5,]
+class(chess_data[5,])
+```
+Removing the header
+```{r}
+newChessData<-chess_data[-c(1,2),]
+
+class(newChessData)
+head(newChessData, 100)
+```
+
+### Cleaning the data and removing empty strings:
+```{r}
+#([A-Z])\w+
+
+#players <- str_extract_all(chess_data, "([A-Z])\\w+", simplify=TRUE)
+#players <- unlist(players)
+#print(players)
+#playersNew <-str_extract_all(players, "([A-Z][A-Z])\\s\\|")
+#print(playersNew)
+
+playersName <- str_extract_all(chess_data, "(\\s[A-Z]+\\s[A-Z]+)?((\\s|-)[A-Z]+)?(\\s|-)[A-Z]+", simplify=TRUE)
+playersName <- playersName[!apply(playersName == "", 1, all), ]
+playersName
+
+playersState <- str_extract_all(chess_data, "([A-Z][A-Z])\\s\\|", simplify=TRUE)
+playersState <- playersState[!apply(playersState == "", 1, all), ]
+playersState 
+
+gamePoints <- str_extract_all(chess_data, "\\d\\.\\d", simplify=TRUE)
+gamePoints <- gamePoints[!apply(gamePoints == "", 1, all), ]
+gamePoints
+
+class(playersName)
+playersName<- str_remove(playersName, pattern = " USCF ID")
+playersName<- str_remove(playersName, pattern = "ON")
+playersName<- str_remove(playersName, pattern = "R")
+playersName<- str_remove(playersName, pattern = "MI")
+playersName<- str_remove(playersName, pattern = "P")
+playersName<- str_remove(playersName, pattern = "N")       
+playersName<- str_remove(playersName, pattern = " OH")  
+playersName <- playersName[!grepl("^\\s+$", playersName)]
+playersName <- unique(playersName[playersName!= ""])
+playersName
+length(playersName)
+length(playersState)
+length(gamePoints)
+
+```
+### Converting to dataframe, then converting that to an integer. It took me way longer than it should have to figure this out.
+```{r}
+PlayerPreRating <- str_extract_all(chess_data, "R.\\s+\\d+", simplify=TRUE)
+print(PlayerPreRating[1,])
+class(PlayerPreRating)
+#rowMeans: Form Row Sums and Means
+#meanOfRow <- rowMeans(PlayerPreRating, na.rm = TRUE , dims=1 )
+# na. rm = TRUE to exclude missing values
+#meanOfRow
+PlayerPreRating <- as.data.frame(PlayerPreRating)
+class(PlayerPreRating)
+head(PlayerPreRating)
+#meanOfRow <- rowMeans(PlayerPreRating)
+
+subs<-substring(PlayerPreRating,3,7) 
+print(subs)
+beg <-substring(PlayerPreRating,0, 2)
+print(beg)
+
+newSubs<-as.integer(subs)
+print(newSubs)
+class(newSubs)
+
+newSubs<- as.data.frame(newSubs)
+
+class(newSubs)
+PreChessRating <- rowMeans(newSubs, na.rm = TRUE , dims=1 )
+print(PreChessRating)
+#meanOfRow <- rowMeans(PlayerPreRating)
+#I am a bit confused about the average pre chess rating approach. I tried different things, but I am out of time as well. 
+```
+### Combining the dataframes into one
+```{r}
+chessInfo <- data.frame(playersName, playersState, gamePoints, PreChessRating)
+head(chessInfo)
+```
+### Writing to a csv file
+```{r}
+write.csv(chessInfo, file = "/Users/Sangeetha/Downloads/ChessGameNumbers.csv")
+
+```
