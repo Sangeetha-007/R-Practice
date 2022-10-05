@@ -1,0 +1,110 @@
+---
+title: "Assignment 4 - 607"
+author: "Sangeetha Sasikumar"
+date: "10/3/2022"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(tidyr)
+library(dplyr)
+library(ggplot2)
+```
+
+####Loading in the data from an excel sheet which I converted as csv. The key part of this assignment was to pass the blanks in as "NA".
+```{r}
+flights<-read.csv("https://raw.githubusercontent.com/Sangeetha-007/R-Practice/master/607/Assignments/Assignment%204/arrival%20delays%20.csv",na.strings=c("","NA"))
+print(flights)
+```
+
+
+####I am listing the column names. 
+```{r}
+colnames(flights)
+la <-pull(flights)  #dyplyr 
+print(la) #this line of code is just me playing around with dyplyr, it has nothing to do with the actual task!
+```
+
+####This code in this chunk is wrong, and thus commented out, but I kept it for me to sort of look back upon and see the wrong code I tried. 
+```{r}
+#flights_long <- flights %>% gather(Los.Angeles, Phoenix, San.Diego, San.Francisco, Seattle, -c("X", "X.1"))
+#flights_long <- flights %>% gather(Los.Angeles -c(X, X.1))
+```
+
+####Here, I am pivoting the wide data into long format. I renamed 2 columns, and filled in the "NA" values with a top-down approach to filling data. 
+```{r}
+flights_long<-pivot_longer(flights, -c(X, X.1), values_to = "Flight_Count", names_to = "Destination")
+head(flights_long)
+flights_long2 <- fill(flights_long, X, .direction = c("down"))
+head(flights_long2)
+
+```
+
+####I dropped the "NA" values and renamed the first 2 columns. 
+```{r}
+flights_long2<-flights_long2 %>% drop_na() 
+colnames(flights_long2)[1] = "Airline"
+colnames(flights_long2)[2] = "Time"
+print(n=25,flights_long2)
+```
+
+####I took a summary of all the data present. 
+```{r}
+summary(flights_long2)
+```
+
+####I calculated the interquartile range (IQR) of `Flight_Count`. The IQR measures the spread of the middle half of the data.
+```{r}
+print(IQR(flights_long2$`Flight_Count`))
+```
+####I went on to calculate IQR and median grouped by airline. 
+```{r}
+flights_long2 %>%
+  group_by(Airline) %>%
+  summarise(median_arrivalDelay = median(`Flight_Count`), iqr_arrivalDelay = IQR(`Flight_Count`))
+```
+
+####Then for each destination I analyzed it's summary. 
+```{r}
+angeles<-flights_long2%>%group_by(Destination)%>%filter(Destination=="Los.Angeles")
+summary(angeles)
+```
+
+```{r}
+phoenix<-flights_long2%>%group_by(Destination)%>%filter(Destination=="Phoenix")
+summary(phoenix)
+```
+
+```{r}
+diego<-flights_long2%>%group_by(Destination)%>%filter(Destination=="San.Diego")
+summary(diego)
+```
+
+```{r}
+francisco<-flights_long2%>%group_by(Destination)%>%filter(Destination=="San.Francisco")
+summary(francisco)
+```
+
+```{r}
+seattle <-flights_long2%>%group_by(Destination)%>%filter(Destination=="Seattle")
+summary(seattle)
+```
+
+####Finally, I made bar graphs filtering the data between "on time" and "delayed". 
+
+```{r}
+onTime<-flights_long2%>%filter(Time=="on time")
+onTime
+
+ggplot(onTime, aes(fill=`Airline`, y=`Flight_Count`, x=Destination)) + 
+    geom_bar(position="dodge", stat="identity")
+```
+
+```{r}
+delayed<-flights_long2%>%filter(Time=="delayed")
+delayed
+
+ggplot(delayed, aes(fill=`Airline`, y=`Flight_Count`, x=Destination)) + 
+    geom_bar(position="dodge", stat="identity")
+```
