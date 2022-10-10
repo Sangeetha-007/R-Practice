@@ -1,0 +1,49 @@
+---
+title: "Project 2_607(Part 1)"
+author: "Sangeetha Sasikumar"
+date: "10/9/2022"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
+library(dplyr)
+library(stringr)
+options(dplyr.summarise.inform = FALSE)
+```
+
+##Loaded the data as csv. 
+```{r}
+rejected<-read.csv("https://raw.githubusercontent.com/Sangeetha-007/R-Practice/master/607/Projects/Project%202/Admitted_Rejected%20-%20Sheet1.csv")
+rejected
+```
+
+##I used the sapply function to know what data types each column are. 
+
+```{r}
+sapply(rejected, class)
+```
+
+##I pivoted longer the Admitted & Rejected columns into Count. 
+```{r}
+new_df <- rejected |> pivot_longer(cols=c("Admitted", "Rejected"), names_to="Status",
+               values_to="Count") 
+new_df
+```
+
+##I grouped the dataframe by Gender and Status, then summarized the count. 
+```{r}
+dfForGraph<- new_df %>% group_by(Gender, Status) %>% summarize(Sum = sum(Count))
+dfForGraph
+
+```
+
+##Finally, I made a bar graph divided by their Status (Admitted/Rejected) based on their Gender. 
+```{r}
+ggplot(dfForGraph, aes( y=`Sum`, x=Gender)) + 
+    geom_bar(position="dodge", stat="identity")+facet_wrap(~Status)
+
+```
+
+Source: https://r-graph-gallery.com/48-grouped-barplot-with-ggplot2
