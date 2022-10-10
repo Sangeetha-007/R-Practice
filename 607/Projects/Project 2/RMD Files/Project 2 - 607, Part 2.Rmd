@@ -1,0 +1,109 @@
+---
+title: "Project 2- 607, Part 2"
+author: "Sangeetha Sasikumar"
+date: "10/8/2022"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(stringr)
+library(tidyr)
+library(dplyr)
+options(dplyr.summarise.inform = FALSE)
+```
+##Loaded the csv.
+```{r}
+grades<-read.csv("https://gist.githubusercontent.com/Kimmirikwa/b69d0ea134820ea52f8481991ffae93e/raw/4db7b1698035ee29885d10e1a59bd902716ae168/student_results.csv")
+grades
+```
+
+
+##Split the column where the data was appearing with the sex and age concatenated with a "_". I split that data into 2 columns: Gender and Age. 
+```{r }
+class(grades)
+
+grades[c('Gender', 'Age')] <- str_split_fixed(grades$sex.and.age, '_', 2)
+
+grades 
+```
+##Then I removed the sex.and.age column. 
+```{r}
+grades
+
+grades <- subset(grades, select = -c(4) )
+
+grades
+```
+##Next, I gathered columns 5 to 7, to fill up the columns "Term" and "Grades". 
+```{r}
+grades<- grades %>%
+    gather("Term", "Grades", 5:7)
+grades
+
+```
+##Next, I wanted to break up the "Term" column, by the dot, so I found out about cbind. It allowed me to create a new dataframe called "new". 
+```{r}
+new <- cbind(read.table(text = as.character(grades$Term), sep=".", 
+         header = FALSE, col.names = c("Col1", "Col2")))
+new
+
+class(new)
+```
+##I used cbind to paste the new dataframe, and the previous dataframe (grades) to paste them together. 
+```{r}
+grades_updated <- cbind(grades, new)
+grades_updated
+
+colnames(grades_updated)
+```
+##Next, I got rid of the Col1 column and the Term column. 
+```{r}
+grades_updated <- subset(grades_updated, select = -c(Col1, Term))
+grades_updated
+```
+##Renamed Col2 to Term. 
+```{r}
+grades_updated <- grades_updated %>%
+  rename(Term = Col2)
+
+grades_updated
+```
+##I needed "test.number"'s values to become variable names. 7 is the column where values will fill in under the new variables created. 
+```{r}
+grades_updated<-spread(grades_updated, "test.number", 7)
+grades_updated
+```
+##I wanted to get the mean grade, grouped by the phone number (average of each student's test 1).
+```{r}
+grades_updated %>% 
+      group_by(phone) %>% 
+      summarise(Mean=mean(`test 1`))
+
+```
+##Next, I took the average of each student's Test 1 and Test 2 throughout each term. 
+```{r}
+averagesOfeachStudent<- grades_updated %>% 
+      group_by(name, Term) %>% 
+      summarise(Average=(`test 1`+`test 2`)/2)
+
+averagesOfeachStudent
+```
+
+##Finally, I took the average of each student based on both tests from all 3 terms. 
+```{r}
+averagesOfeachStudent %>% group_by(name)%>% 
+      summarise(Mean=mean(Average))
+```
+Sources: 
+https://www.listendata.com/2015/06/r-keep-drop-columns-from-data-frame.html,
+https://www.geeksforgeeks.org/how-to-split-column-into-multiple-columns-in-r-dataframe/, 
+https://stackoverflow.com/questions/66953570/r-split-one-column-into-two-when-the-divider-is-a-dot,
+https://www.programmingr.com/examples/r-dataframe/cbind-in-r/,
+https://stackoverflow.com/questions/4605206/drop-data-frame-columns-by-name,
+http://statseducation.com/Introduction-to-R/modules/tidy%20data/spread/
+
+
+
+
+
