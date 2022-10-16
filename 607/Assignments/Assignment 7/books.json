@@ -1,0 +1,28 @@
+[
+    {
+      "ID":1,   
+      "title": "Beautiful Creatures",
+      "author": "Kami Garcia and Margaret Stohl",
+      "Year of Publish": 2009,
+      "publisher":"Little, Brown Books for Young Readers",
+      "genre":"Fantasy"
+    },
+    {   "ID":2, 
+        "title": "East of Eden",
+        "author": "John Steinbeck",
+        "Year of Publish": 2003,
+        "publisher":"Viking",
+        "genre":"Fiction"
+
+    },
+    {
+        "ID":3, 
+        "title": "The Catcher in the Rye",
+        "author": "J.D. Salinger",
+        "Year of Publish": 1991,
+        "publisher":"Little, Brown and Company",
+        "genre":"Young adult fiction"
+    }
+
+]
+
