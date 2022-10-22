@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<source>
+    <publisher/>
+    <publisherurl/>
+    <job>
+        <title/>
+        <date/>
+        <referencenumber/>
+        <url/>
+        <company/>
+        <sourcename/>
+        <city/>
+        <state/>
+        <country/>
+        <email/>
+        <postalcode/>
+        <description/>
+        <salary/>
+        <education/>
+        <jobtype/>
+        <category/>
+        <experience/>
+        <indeed-apply-data>
+            <![CDATA[indeed-apply-apiToken=1234ABCDE&indeed-apply-jobTitle=Professional+B
+            asket+Weaver&indeed-apply-jobId=Sample+ID&indeed-apply-jobCompanyName=My+Favo
+            rite+Company&indeed-apply-jobLocation=Austin+TX&indeed-apply-jobUrl=http%3A%2
+            F%2Fwww.indeed.com&indeed-apply-postUrl=https%3A%2F%2Fhookb.in%2FPxOjJqJELNH8
+            lZLZDkpz&indeed-apply-questions=https%3A%2F%2Fpastebin.com%2Fraw%2F0vXq9q9b%2
+            3]]>
+        </indeed-apply-data>
+    </job>
+</source>
