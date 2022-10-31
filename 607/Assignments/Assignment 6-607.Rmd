@@ -1,0 +1,60 @@
+---
+title: "Assignment 6 - 607"
+author: "Sangeetha Sasikumar"
+date: "10/28/2022"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(httr)
+library(jsonlite)
+library(wordcloud)
+library(xml2)
+```
+
+For assignment 6, we were asked to use the New York Times API to import data. I chose the Movie Reviews API. I passed in the key through a text file on my local machine just so the key wouldn't be public in RPubs/Github. 
+
+```{r}
+NYTIMES_KEY <- readLines("NYTIMES_KEY.txt")
+
+#https://api.nytimes.com/svc/archive/v1/2019/1.json?api-key=yourkey
+
+url <- paste0("https://api.nytimes.com/svc/movies/v2/critics/full-time.json?api-key=", NYTIMES_KEY)
+nyt <- GET(url)
+nyt
+
+details<-content(nyt, "parse")
+details
+```
+I made new dataframes for the bio, display_name and status. 
+
+```{r}
+names(details)
+
+bio<-as.data.frame(details$results[[1]]$bio)
+bio
+
+critic<-as.data.frame(details$results[[3]]$display_name)
+critic
+
+status<-as.data.frame(details$results[[3]]$status)
+status
+
+
+```
+
+Then, I used cbind() to combine the 3 dataframes I made. 
+
+```{r}
+critic_df <-grades_updated <- cbind(critic, status, bio)
+critic_df
+```
+Finally, I made a wordcloud of the dataframe, only because I love this visualization tool that I learned of for Project 3. This analysis has no meaning, but it shows how the word "the" is used the most frequently in the dataframe (followed by "and"), which makes sense because even in the title, "THE New York Times", there is a "the".
+```{r}
+wordcloud(words = critic_df, min.freq = 1, max.words=200, random.order=FALSE, rot.per=0.35,colors=brewer.pal(8, "Dark2"))
+
+
+```
+
+I personally felt like I should go back and choose a different API (everyone from class seemed to talk about the books API), but also felt I should stick with this since I don't need to do the same thing others do. 
