@@ -1,0 +1,221 @@
+---
+title: "Project 2-607 (Resubmit)"
+author: "Sangeetha Sasikumar"
+date: "11/2/2022"
+output: html_document
+---
+
+##Part 1
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
+library(dplyr)
+library(stringr)
+library(tidyr)
+library(ggplot2)
+options(dplyr.summarise.inform = FALSE)
+```
+
+###Loaded the data as csv. 
+In this dataset, the columns are gender, department, admitted and whether or not they are rejected. I am going to try to clean up this dataset. 
+```{r}
+rejected<-read.csv("https://raw.githubusercontent.com/Sangeetha-007/R-Practice/master/607/Projects/Project%202/Admitted_Rejected%20-%20Sheet1.csv")
+rejected
+```
+
+###I used the sapply function to know what data types each column are. 
+
+```{r}
+sapply(rejected, class)
+```
+
+###I pivoted longer the Admitted & Rejected columns into Count. 
+```{r}
+new_df <- rejected |> pivot_longer(cols=c("Admitted", "Rejected"), names_to="Status",
+               values_to="Count") 
+new_df
+```
+
+###I grouped the dataframe by Gender and Status, then summarized the count. 
+```{r}
+dfForGraph<- new_df %>% group_by(Gender, Status) %>% summarize(Sum = sum(Count))
+dfForGraph
+
+```
+
+###Finally, I made a bar graph divided by their Status (Admitted/Rejected) based on their Gender. The bar graphs show how for admitted and rejected there are more females than males. 
+```{r}
+ggplot(dfForGraph, aes( y=`Sum`, x=Gender, fill=Gender)) + 
+    geom_bar(position="dodge", stat="identity")+facet_wrap(~Status)
+
+```
+
+Source: https://r-graph-gallery.com/48-grouped-barplot-with-ggplot2
+
+##Part 2
+
+###Loaded the csv.
+This dataset presents a bunch of test scores for students, just by a quick look at the dataset, we can tell that the data is "dirty". 
+```{r}
+grades<-read.csv("https://gist.githubusercontent.com/Kimmirikwa/b69d0ea134820ea52f8481991ffae93e/raw/4db7b1698035ee29885d10e1a59bd902716ae168/student_results.csv")
+grades
+```
+
+
+###The first "messy" part I noticed was the "sex.and.age" column. In order to clean that up, I split the column where the data was appearing with the sex and age concatenated with a "_". I split that data into 2 columns: Gender and Age. 
+```{r }
+class(grades)
+
+grades[c('Gender', 'Age')] <- str_split_fixed(grades$sex.and.age, '_', 2)
+
+grades 
+```
+###Then I removed the sex.and.age column because we already have that data in 2 separate columns. 
+```{r}
+grades
+
+grades <- subset(grades, select = -c(4) )
+
+grades
+```
+###Next, I gathered columns 5 to 7, to fill up the columns "Term" and "Grades". 
+```{r}
+grades<- grades %>%
+    gather("Term", "Grades", 5:7)
+grades
+
+```
+###Next, I wanted to break up the "Term" column, by the dot, so I found out about cbind. It allowed me to create a new dataframe called "new". 
+```{r}
+new <- cbind(read.table(text = as.character(grades$Term), sep=".", 
+         header = FALSE, col.names = c("Col1", "Col2")))
+new
+
+class(new)
+```
+###I used cbind to paste the new dataframe, and the previous dataframe (grades) to paste them together. 
+```{r}
+grades_updated <- cbind(grades, new)
+grades_updated
+
+colnames(grades_updated)
+```
+###Next, I got rid of the Col1 column and the Term column. 
+```{r}
+grades_updated <- subset(grades_updated, select = -c(Col1, Term))
+grades_updated
+```
+###Renamed Col2 to Term. 
+```{r}
+grades_updated <- grades_updated %>%
+  rename(Term = Col2)
+
+grades_updated
+```
+###I needed "test.number"'s values to become variable names. 7 is the column where values will fill in under the new variables created. 
+```{r}
+grades_updated<-spread(grades_updated, "test.number", 7)
+grades_updated
+```
+###I wanted to get the mean grade, grouped by the phone number (average of each student's test 1).
+```{r}
+grades_updated %>% 
+      group_by(phone) %>% 
+      summarise(Mean=mean(`test 1`))
+
+```
+###Next, I took the average of each student's Test 1 and Test 2 throughout each term. 
+```{r}
+averagesOfeachStudent<- grades_updated %>% 
+      group_by(name, Term) %>% 
+      summarise(Average=(`test 1`+`test 2`)/2)
+
+averagesOfeachStudent
+```
+
+###Finally, I took the average of each student based on both tests from all 3 terms. I am actually quite proud of my cleaning technique I presented here. I am not the most confident when it comes to cleaning data, but I think I am slowly improving. Linda is the student with the highest mean grade and Mary is the student with the lowest mean grade. 
+```{r}
+averagesOfeachStudent %>% group_by(name)%>% 
+      summarise(Mean=mean(Average))
+```
+Sources: 
+https://www.listendata.com/2015/06/r-keep-drop-columns-from-data-frame.html,
+https://www.geeksforgeeks.org/how-to-split-column-into-multiple-columns-in-r-dataframe/, 
+https://stackoverflow.com/questions/66953570/r-split-one-column-into-two-when-the-divider-is-a-dot,
+https://www.programmingr.com/examples/r-dataframe/cbind-in-r/,
+https://stackoverflow.com/questions/4605206/drop-data-frame-columns-by-name,
+http://statseducation.com/Introduction-to-R/modules/tidy%20data/spread/
+
+##Part 3
+
+
+###Loaded in the data from the csv. This was a very cute dataset I found from the Blackboard Discussion Board of fruit prices, with their calories. 
+```{r}
+fruits<-read.csv("https://raw.githubusercontent.com/Sangeetha-007/R-Practice/master/607/Projects/Project%202/Fruit%20Prices.csv")
+fruits
+
+```
+
+###Since it's a tiny dataset, I noticed how there are duplicates, but I am going to take care of it in the same way I would if it was a very large dataset. Therefore, I used the "duplicated" function to check if there are duplicates. Then, I used the distinct function to remove duplicates. 
+```{r}
+duplicated(fruits)
+
+fruits<- distinct(fruits)
+fruits
+```
+
+
+###I used the gsub method to remove quotation marks from the item column. We know that the item column is a string, but we don't need the quotations around it. 
+```{r}
+fruits$item<-gsub('"',"",as.character(fruits$item))
+fruits
+```
+
+###Next, I used gsub to remove quotation marks from the price column. 
+```{r}
+class(fruits)
+
+fruits$price<- gsub('"',"",as.character(fruits$price))
+
+```
+
+###I tried to use gsub to remove the quotation marks from the price, but it didn't work. It ended up working with the gsub inside a mutate. 
+```{r}
+#This code did not work. 
+#fruits$price<- gsub('$',"",as.character(fruits$price))
+#fruits
+```
+```{r}
+fruits %>% 
+  mutate(across(starts_with("price"), ~gsub("\\$", "", .) %>% as.numeric))
+```
+```{r}
+sapply (fruits, class)
+fruits
+```
+
+###I used parse_number inside a mutate to convert the price from character to a numeric. 
+```{r}
+fruits<- fruits %>%  
+  mutate(price = parse_number(price))
+
+sapply(fruits, class)
+fruits
+
+```
+```{r}
+summarise(fruits)
+```
+###Finally, I created a bar graph to show the calories of each item. The graph shows bananas have the most calories, and clementines have the least. This dataset would be even more interesting if I can gather data on a lot more fruits, and include a column on each fruit's vitamin C percentage. 
+```{r}
+ggplot(fruits, aes( y=`calories`, x=item, fill=item)) + 
+    geom_bar(position="dodge",stat = "identity")+  
+  scale_fill_manual(values=c("#66b447",
+                             "#ffe135",
+                             "orange",
+                             "#DE7E5D"))
+```
+
+Source: https://www.datanovia.com/en/lessons/identify-and-remove-duplicate-data-in-r/,
+https://stackoverflow.com/questions/64741916/how-to-remove-the-dollar-sign-in-r
+
