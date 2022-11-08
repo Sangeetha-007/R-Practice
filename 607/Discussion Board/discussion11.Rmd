@@ -1,0 +1,30 @@
+---
+title: "Discussion 11"
+author: "Sangeetha Sasikumar"
+date: "11/7/2022"
+output: html_document
+---
+
+###Recommender Systems- Spotify
+
+1. Perform a Scenario Design analysis as described below.  Consider whether it makes sense for your selected recommender system to perform scenario design twice, once for the organization (e.g. Amazon.com) and once for the organization's customers.
+  
+  -Who are your target users?
+  -What are their key goals?
+  -How can you help them accomplish those goals?
+  
+My favorite recommender system is Spotify. I love listening to music especially while driving in the car. My name actually means "of musical personality" in Sanskrit! Spotify's users include all lovers of music (premium users and non premium users). They also have podcast listeners and the people who publish their music and podcasts on Spotify. Females Make Up 56% of Spotify’s User Base in the U.S. According to Spotify Newsroom, their mission statement is "Our mission is to unlock the potential of human creativity – by giving a million creative artists the opportunity to live off their art and billions of fans the opportunity to enjoy and be inspired by it." We can support Spotify's goal by continuing to use their service, and to even be a premium user. 
+
+
+2. Attempt to reverse engineer what you can about the site, from the site interface and any available information that you can find on the Internet or elsewhere.
+
+At the end of the year, Spotify has its "Spotify Wrapped" which is very interesting because we get our very own personal analysis of which song we listened to the most, which artist we listened to the most and which mood of song we listened to the most (sentiment analysis on music!). They have different features on music such as danceability, energy, loudness, speechiness, acousticness etc. Also the Spotify Wrapped has colors associated to each mood. The colors represent auras, and sort of try to predict the personality of the listener. Purple is given to songs that keep you going through the day. Green represents a calm aura. Oranges represent the bold type. Yellows represent goal orientation/focus and blues are emotional. I remember last year for my aura I got a mix of purple and orange. I couldn't find the exact info on Spotify's reverse engineering, but that's because they have competitors like SiriusXM, Apple Music and SoundCloud and wouldn't want to reveal confidential information. Since I worked at SiriusXM for a while I assume Spotify has a similar algorithm: songs are recommended based on skips, replays and pauses. Skip would mean the user shouldn't get that song recommended in future.  
+
+3. Include specific recommendations about how to improve the site's recommendation capabilities going forward. 
+
+I think Spotify is really good the way it is, but I wish there was a way to turn the recommender songs "off". When I create a playlist, sometimes I would like to hear only the songs I like and not have the ones predicted by the Spotify algorithm. Other than than, it would be nice to have more skips without paying for premium. 
+
+
+Sources:
+https://thesocialshepherd.com/blog/spotify-statistics,
+https://towardsdatascience.com/reverse-engineering-spotify-wrapped-ai-using-python-452b58ad1a62, https://www.distractify.com/p/what-does-spotify-wrapped-audio-aura-mean
