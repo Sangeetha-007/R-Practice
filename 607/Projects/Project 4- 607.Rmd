@@ -1,0 +1,169 @@
+---
+title: "Project4-607"
+author: "Sangeetha Sasikumar"
+date: "11/20/2022"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
+library(tm)
+library(tmaptools)
+library(stringr)
+library(SnowballC)
+library(knitr)
+library(tidytext)
+library(wordcloud)
+library(e1071)
+```
+
+It can be useful to be able to classify new "test" documents using already classified "training" documents.  A common example is using a corpus of labeled spam and ham (non-spam) e-mails to predict whether or not a new document is spam. For this project, you can start with a spam/ham dataset, then predict the class of new documents (either withheld from the training dataset or from another source such as your own spam folder).   One example corpus:   https://spamassassin.apache.org/old/publiccorpus/
+```{r}
+#ham_url <- "https://spamassassin.apache.org/old/publiccorpus/20021010_easy_ham.tar.bz2"
+#spam_url <- "https://spamassassin.apache.org/old/publiccorpus/20021010_spam.tar.bz2"
+#download.file(ham_url, destfile = "ham_folder")
+#ham_file <- untar("20021010_spam.tar.bz2", list = TRUE)
+
+ham_dir<-'/Users/Sangeetha/easy_ham'
+
+hamFiles = list.files(ham_dir)
+length(hamFiles)
+
+#head(hamFiles)
+
+# List of docs and for loop to tranverse and create new list
+ham_list <- NA
+for(i in 1:length(hamFiles))
+{
+  filepath<-paste0(ham_dir, "/", hamFiles[1])  
+  txt <-readLines(filepath)
+  list1<- list(paste(txt, collapse="\n"))
+  ham_list = c(ham_list,list1)
+  
+}
+
+# ham data frame (non-spam)
+ham <-as.data.frame(unlist(ham_list),stringsAsFactors = FALSE)
+ham$type <- "ham"
+colnames(ham) <- c("text","type")
+
+head(ham)
+
+# Spam Dataframe
+spam_directory="/Users/Sangeetha/spam"
+spamFileNames = list.files(spam_directory)
+
+#loop to readlines in
+spam_list <- NA
+for(i in 1:length(spamFileNames))
+{
+  filepath<-paste0(spam_directory, "/", spamFileNames[1])  
+  text <-readLines(filepath)
+  list1<- list(paste(text, collapse="\n"))
+  #creating a new list
+  spam_list = c(spam_list,list1)
+  
+}
+head(spam_list)
+spamDF <-as.data.frame(unlist(spam_list),stringsAsFactors = FALSE)
+spamDF$type <- "spam"
+colnames(spamDF) <- c("text","type")
+head(spamDF)
+
+
+# creating combined data frame of spam and ham
+spam_ham_df <- rbind(ham, spamDF)
+```
+
+
+
+```{r}
+emailCorpus <- VCorpus(VectorSource(spam_ham_df$text))
+#Spam Corpus Cleaning
+cleanCorpus <- tm_map(emailCorpus, removeNumbers)
+cleanCorpus <- tm_map(cleanCorpus, removePunctuation)
+cleanCorpus <- tm_map(cleanCorpus, removeWords, stopwords())
+cleanCorpus <- tm_map(cleanCorpus, stripWhitespace)
+
+```
+
+```{r}
+#Term document matrix is also a method for representing the text data. In this method, the text data is represented in the form of a matrix. The rows of the matrix represent the sentences from the data which needs to be analyzed and the columns of the matrix represent the word
+email_dtm <- DocumentTermMatrix(cleanCorpus)
+# Preparation for spam wordlcloud
+spam_prep <- which(spam_ham_df$type == "spam")
+suppressWarnings(wordcloud(cleanCorpus[spam_prep], min.freq=20, colors=brewer.pal(8, "Dark2")))
+
+```
+
+The wordcloud above printed out some gibberish, but I am guessing this gibberish was in the emails. 
+```{r}
+#preparing ham data for wordcloud
+ham_prep <- which(spam_ham_df$type == "ham")
+suppressWarnings(wordcloud(cleanCorpus[ham_prep], min.freq=20, colors=brewer.pal(8, "Dark2")))
+
+```
+The above wordcloud seems to be correct, the most occurring word is "tmdadeepeddyvirciocom" and I have no idea what that means neither do I want to look it up, but this word has got me wondering if the way I did this is correct or maybe my dataset was just a bit odd. 
+
+```{r}
+# Model to assess spam and ham
+
+# 70% data training and 30 % for evaluation/prediction. Online it says this percentage is the most ideal
+
+sample_size <- floor(0.70 * nrow(spam_ham_df))
+
+# Seed to make your partition reproductible
+set.seed(150)
+training <- sample(seq_len(nrow(spam_ham_df)), size = sample_size)
+
+spam_ham_train <- spam_ham_df[training, ]
+spam_ham_test <- spam_ham_df[-training, ]
+
+# count of spam and ham in train data set
+spam<-subset(spam_ham_train,spam_ham_train$type == "spam")
+ham<-subset(spam_ham_train,spam_ham_train$type == "ham")
+
+
+# Corpus for training and test data
+train_email_corpus <- VCorpus(VectorSource(spam_ham_train$text))
+test_email_corpus <- VCorpus(VectorSource(spam_ham_test$text))
+#---------------------
+clean_corpus_train <- tm_map(train_email_corpus ,removeNumbers)
+clean_corpus_test <- tm_map(test_email_corpus, removeNumbers)
+#---------------------
+clean_corpus_train <- tm_map(clean_corpus_train, removePunctuation)
+clean_corpus_test <- tm_map(clean_corpus_test, removePunctuation)
+#---------------------
+clean_corpus_train <- tm_map(clean_corpus_train, removeWords, stopwords())
+clean_corpus_test  <- tm_map(clean_corpus_test, removeWords, stopwords())
+#---------------------
+clean_corpus_train <- tm_map(clean_corpus_train, stripWhitespace)
+clean_corpus_test  <- tm_map(clean_corpus_test, stripWhitespace)
+#---------------------
+train_emailMatrix <- DocumentTermMatrix(clean_corpus_train)
+test_emailMatrix <- DocumentTermMatrix(clean_corpus_test)
+
+# count function to create table
+count_words <- function(input) {
+  output <- ifelse(input > 0, 1,0)
+  output <- factor(output, levels=c(0,1), labels=c("No", "Yes"))
+  output
+}
+
+train <- apply(train_emailMatrix, 2, count_words)
+test <- apply(test_emailMatrix , 2, count_words)
+
+# Email classification
+classifier <- naiveBayes(train, factor(spam_ham_train$type))
+#print(classifier)
+
+test_pred <- predict(classifier, newdata=test)
+
+print(table(test_pred, spam_ham_test$type))
+
+```
+My final thoughts: This project was very good learning experience for me but I still won't be able to reproduce this without looking many things up. I would have to do this a few more times in my own time to fully get a grasp. It definitely was very challenging, thus I ran out of time to write better explanations. 
+
+Sources: https://docs.aws.amazon.com/machine-learning/latest/dg/splitting-the-data-into-training-and-evaluation-data.html, https://analyticsindiamag.com/a-guide-to-term-document-matrix-with-its-implementation-in-r-and-python/#:~:text=Term%20document%20matrix%20is%20also,the%20matrix%20represent%20the%20word., https://www.youtube.com/watch?v=O6CGXnxPHok
+
